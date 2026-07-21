@@ -1,3 +1,7 @@
+开启虚拟机后先远程连接rdk
+连接时命令有：
+1. 先ping rdk ip地址	检查是否能连通
+2. ssh sunrise@rdk ip地址       远程连接上虚拟机
 
 # 安装pinocchio(两端都要安装)
 sudo apt update
@@ -297,6 +301,31 @@ sudo udevadm trigger
 python -c "from pyorbbecsdk import Context; d=Context().query_devices(); print('检测到摄像头数量:', d.get_count())"
 # 必须输出：
 检测到摄像头数量: 1
+
+# 检查系统和环境配置
+echo "===== 系统 ====="
+lsb_release -a
+uname -m
+echo "===== 基础软件 ====="
+command -v conda || true
+conda --version 2>/dev/null || true
+python3 --version
+git --version
+echo "===== Conda 环境 ====="
+conda env list 2>/dev/null || true
+echo "===== USB 设备 ====="
+lsusb
+lsusb -t
+echo "===== 机械臂串口 ====="
+ls -l /dev/ttyACM* /dev/ttyUSB* 2>/dev/null || true
+echo "===== 是否存在旧控制进程 ====="
+ps -ef | grep -E '[s]lcand|[r]ebotarm|[r]os2'
+echo "===== 已有项目 ====="
+find ~ -maxdepth 3 -type d \( -name "rebot_grasp" -o -name "reBotArm_control_py" \) 2>/dev/null
+echo "===== GPU（没有也没关系） ====="
+nvidia-smi 2>/dev/null || echo "虚拟机内没有可用 NVIDIA GPU"
+
+# 如果无法识别到摄像头，可以检查一下是不是USB的协议太低导致的，关闭虚拟机后更改USB协议至3.0
 
 # 配置相机和轻量模型
 cd ~/rebot_grasp
